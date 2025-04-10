@@ -13,7 +13,7 @@ Find objects using geocode and addresses
 7. Add the token to `Authorization: Bearer <your_token>` HTTP header
 8. Enjoy!
 
-### /address/geocode
+#### /address/geocode
 Specify latitude and longitude in the request body
 ```
 {
@@ -44,7 +44,7 @@ Get the list of places at that location
 }
 ```
 
-### /address/search
+#### /address/search
 Specify the location
 ```
 {
