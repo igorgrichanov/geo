@@ -1,0 +1,243 @@
+basePath: /api
+consumes:
+- application/json
+definitions:
+  Address:
+    properties:
+      city:
+        type: string
+      house:
+        type: string
+      lat:
+        type: string
+      lon:
+        type: string
+      street:
+        type: string
+    type: object
+  AddressResponse:
+    properties:
+      addresses:
+        items:
+          $ref: '#/definitions/Address'
+        type: array
+    type: object
+  CredentialsRequest:
+    properties:
+      login:
+        example: admin
+        type: string
+      password:
+        example: "123456"
+        type: string
+    type: object
+  address.GeocodeRequest:
+    properties:
+      lat:
+        example: "55.8481373"
+        type: string
+      lng:
+        example: "37.6414907"
+        type: string
+    type: object
+  address.SearchRequest:
+    properties:
+      query:
+        example: г Москва, ул Снежная
+        type: string
+    type: object
+  auth.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      token_type:
+        type: string
+    type: object
+  response.ErrResponse:
+    properties:
+      error:
+        type: string
+      error_description:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      status:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: |-
+    Geoservice API allows users to search for addresses and geocode locations.
+    It supports authentication via JWT tokens and follows RESTful principles.
+  title: Geoservice API
+  version: "1.0"
+paths:
+  /address/geocode:
+    post:
+      parameters:
+      - description: object coordinates
+        in: body
+        name: coordinates
+        required: true
+        schema:
+          $ref: '#/definitions/address.GeocodeRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AddressResponse'
+        "400":
+          description: invalid lat or lng format
+          schema:
+            $ref: '#/definitions/response.ErrResponse'
+        "401":
+          $ref: "#/responses/AuthFailed"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Array of addresses located at specified coordinates
+      tags:
+      - address
+  /address/search:
+    post:
+      parameters:
+      - description: object location
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/address.SearchRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AddressResponse'
+        "400":
+          description: invalid query format
+          schema:
+            $ref: '#/definitions/response.ErrResponse'
+        "401":
+          $ref: "#/responses/AuthFailed"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Array of addresses located at specified location
+      tags:
+      - address
+  /login:
+    post:
+      description: Get the Bearer token using your Login and Password. If the token's
+        lifetime has expired, you need to log in again. If you don't have an account,
+        see /register endpoint
+      parameters:
+      - description: your credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/CredentialsRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.LoginResponse'
+        "400":
+          description: invalid login/password format
+          schema:
+            $ref: '#/definitions/response.ErrResponse'
+        "401":
+          description: Invalid username or password
+          schema:
+            $ref: '#/definitions/response.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrResponse'
+      summary: Log in to the api
+      tags:
+        - auth
+  /logout:
+    delete:
+      description: Log out and revoke the Bearer token
+      responses:
+        "204":
+          description: Logged out successfully
+        "401":
+          $ref: "#/responses/AuthFailed"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Log out from the server
+      tags:
+        - auth
+  /register:
+    post:
+      description: Choose a login and set up a password
+      parameters:
+      - description: your credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/CredentialsRequest'
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid request parameters
+          schema:
+            $ref: '#/definitions/response.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrResponse'
+      summary: Register on the server
+      tags:
+        - auth
+responses:
+  AuthFailed:
+    description: "Unauthorized: Token missing or invalid"
+    headers:
+      "WWW-Authenticate: Bearer, error=\"invalid_token\", error_description=\"Token expired\"":
+        description: Token expired
+        type: string
+      "WWW-Authenticate: Bearer, error=\"invalid_token\", error_description=\"Token has been revoked\"":
+        description: Token has been revoked
+        type: string
+      "WWW-Authenticate: Bearer, error=\"invalid_token\", error_description=\"Token is malformed\"":
+        description: Token is malformed, try to renew it
+        type: string
+      "WWW-Authenticate: Bearer":
+        description: Authorization method missed
+        type: string
+produces:
+- application/json
+schemes:
+- http
+securityDefinitions:
+  ApiKeyAuth:
+    description: 'Specify the Bearer token in the format `Bearer <your_token>`'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
+tags:
+- description: Get array of addresses
+  name: address
+- description: Authorization and authentication
+  name: auth

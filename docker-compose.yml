@@ -1,0 +1,9 @@
+name: geo
+
+services:
+  app:
+    build: .
+    container_name: geoservice
+    ports:
+      - "8080:8080"
+    pull_policy: never

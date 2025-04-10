@@ -1,0 +1,367 @@
+{
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Geoservice API allows users to search for addresses and geocode locations.\nIt supports authentication via JWT tokens and follows RESTful principles.",
+        "title": "Geoservice API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "paths": {
+        "/address/geocode": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Array of addresses located at specified coordinates",
+                "parameters": [
+                    {
+                        "description": "object coordinates",
+                        "name": "coordinates",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/address.GeocodeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/AddressResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid lat or lng format",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "headers": {
+                            "WWW-Authenticate": {
+                                "type": "string",
+                                "description": "Bearer"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/address/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Array of addresses located at specified location",
+                "parameters": [
+                    {
+                        "description": "object location",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/address.SearchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/AddressResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid query format",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "headers": {
+                            "WWW-Authenticate": {
+                                "type": "string",
+                                "description": "Bearer"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Get the Bearer token using your Login and Password. If the token's lifetime has expired, you need to log in again. If you don't have an account, see /register endpoint",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Log in to the api",
+                "parameters": [
+                    {
+                        "description": "your credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CredentialsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid login/password format",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid username or password",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Log out and revoke the Bearer token",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Log out from the server",
+                "responses": {
+                    "204": {
+                        "description": "Logged out successfully"
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "headers": {
+                            "WWW-Authenticate": {
+                                "type": "string",
+                                "description": "Bearer"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "description": "Choose a login and set up a password",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register on the server",
+                "parameters": [
+                    {
+                        "description": "your credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CredentialsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request parameters",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Address": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "house": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "string"
+                },
+                "lon": {
+                    "type": "string"
+                },
+                "street": {
+                    "type": "string"
+                }
+            }
+        },
+        "AddressResponse": {
+            "type": "object",
+            "properties": {
+                "addresses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Address"
+                    }
+                }
+            }
+        },
+        "CredentialsRequest": {
+            "type": "object",
+            "properties": {
+                "login": {
+                    "type": "string",
+                    "example": "admin"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "123456"
+                }
+            }
+        },
+        "address.GeocodeRequest": {
+            "type": "object",
+            "properties": {
+                "lat": {
+                    "type": "string",
+                    "example": "55.8481373"
+                },
+                "lng": {
+                    "type": "string",
+                    "example": "37.6414907"
+                }
+            }
+        },
+        "address.SearchRequest": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "example": "г Москва, ул Снежная"
+                }
+            }
+        },
+        "auth.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.ErrResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "error_description": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Response": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "description": "Specify the Bearer token in the format `Bearer \u003cyour_token\u003e`",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "tags": [
+        {
+            "description": "Get array of addresses",
+            "name": "address"
+        },
+        {
+            "description": "Authorization and authentication",
+            "name": "auth"
+        }
+    ]
+}

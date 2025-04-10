@@ -1,0 +1,14 @@
+dadata:
+  api_key: "a2a6ac11ae918d96e520b2bc016ff46a4647d1b1"
+  api_secret: "d861a7a9ca7bd89b8cb836c560c6fdacc3e2b927"
+geoservice:
+  host: ""
+  port: ":8080"
+  shutdown_timeout: 5s
+  read_timeout: 10s
+  write_timeout: 10s
+  idle_timeout: 30s
+token:
+  secret: "secret"
+  ttl: 10m
+  skew: 30s
