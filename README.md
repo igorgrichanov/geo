@@ -80,7 +80,7 @@ Get the list of addresses located at specified location
 
 This project serves as a [DaData](https://dadata.ru/api/) API adapter.
 
-API documentation is available at /swagger endpoint.
+API documentation is available at http://localhost:8080/swagger.
 
 ## Features
 
